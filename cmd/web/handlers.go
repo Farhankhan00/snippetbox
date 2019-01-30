@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/Farhankhan00/snippetbox/pkg/models"
 )
 
 //Define a home handler function which writes a byte slice containing
@@ -15,22 +16,31 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	files := []string{
-		"./ui/html/home.page.tmpl",
-		"./ui/html/base.layout.tmpl",
-		"./ui/html/footer.partial.tmpl",
-	}
 
-	ts, err := template.ParseFiles(files...)
+	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(w, err)
 		return
 	}
-	err = ts.Execute(w, nil)
-	if err != nil {
-		app.serverError(w, err)
-		return
+	for _, snippet := range s {
+		fmt.Fprintf(w, "%v\n", snippet)
 	}
+	// files := []string{
+	// 	"./ui/html/home.page.tmpl",
+	// 	"./ui/html/base.layout.tmpl",
+	// 	"./ui/html/footer.partial.tmpl",
+	// }
+
+	// ts, err := template.ParseFiles(files...)
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
+	// err = ts.Execute(w, nil)
+	// if err != nil {
+	// 	app.serverError(w, err)
+	// 	return
+	// }
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +49,16 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
+
+	s, err := app.snippets.Get(id)
+	if err == models.ErrNoRecord {
+		app.notFound(w)
+		return
+	} else if err != nil {
+		app.serverError(w, err)
+	}
+
+	fmt.Fprintf(w, "%v", s)
 }
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
