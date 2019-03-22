@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -17,12 +18,14 @@ type application struct {
 	infoLog       *log.Logger
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
+	assetPath     string
 }
 
 func main() {
 
 	port := flag.String("port", ":4000", "HTTP network port")
 	dsn := flag.String("dsn", "snippetbox:password@/snippetbox?parseTime=True", "MySQL data source name")
+	assetPath := flag.String("assetPath", "/opt/snippetbox/assets", "path for static assets")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.LUTC)
@@ -35,7 +38,9 @@ func main() {
 
 	defer db.Close()
 
-	templateCache, err := newTemplateCache("./ui/html/")
+	templateCache, err := newTemplateCache(
+		fmt.Sprintf("%s/%s", *assetPath, "ui/html/"),
+	)
 	if err != nil {
 
 		errorLog.Fatal(err)
@@ -46,6 +51,7 @@ func main() {
 		infoLog:       infoLog,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
+		assetPath:     *assetPath,
 	}
 
 	srv := &http.Server{
