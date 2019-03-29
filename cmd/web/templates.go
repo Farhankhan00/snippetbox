@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Farhankhan00/snippetbox/pkg/forms"
 	"github.com/Farhankhan00/snippetbox/pkg/models"
 )
 
@@ -46,6 +47,7 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 
 type templateData struct {
 	CurrentYear int
+	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
