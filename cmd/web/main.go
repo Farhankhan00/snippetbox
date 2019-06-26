@@ -8,14 +8,17 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Farhankhan00/snippetbox/pkg/models/mysql"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golangcollege/sessions"
 )
 
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	session       *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 	assetPath     string
@@ -26,6 +29,7 @@ func main() {
 	port := flag.String("port", ":4000", "HTTP network port")
 	dsn := flag.String("dsn", "snippetbox:password@/snippetbox?parseTime=True", "MySQL data source name")
 	assetPath := flag.String("assetPath", "/opt/snippetbox/assets", "path for static assets")
+	secret := flag.String("secret", "WDJf4Xt7dR7AnQw*L$RShqnQ!Tc9zMPK", "Session Secret key")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime|log.LUTC)
@@ -39,16 +43,20 @@ func main() {
 	defer db.Close()
 
 	templateCache, err := newTemplateCache(
-		fmt.Sprintf("%s/%s", *assetPath, "ui/html/"),
+		fmt.Sprintf("%s/%s", *assetPath, "ui/"),
 	)
 	if err != nil {
 
 		errorLog.Fatal(err)
 	}
 
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 12 * time.Hour
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
+		session:       session,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
 		assetPath:     *assetPath,

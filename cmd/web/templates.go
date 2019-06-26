@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/Farhankhan00/snippetbox/pkg/forms"
 	"github.com/Farhankhan00/snippetbox/pkg/models"
 )
 
@@ -18,7 +19,7 @@ var functions = template.FuncMap{
 
 func newTemplateCache(dir string) (map[string]*template.Template, error) {
 	cache := map[string]*template.Template{}
-	pages, err := filepath.Glob(filepath.Join(dir, "*.page.tmpl"))
+	pages, err := filepath.Glob(filepath.Join(dir, "/html/*.page.tmpl"))
 	if err != nil {
 		return nil, err
 	}
@@ -30,12 +31,12 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 			return nil, err
 		}
 
-		ts, err = ts.ParseGlob(filepath.Join(dir, "*layout.tmpl"))
+		ts, err = ts.ParseGlob(filepath.Join(dir, "/html/*layout.tmpl"))
 		if err != nil {
 			return nil, err
 		}
 
-		ts, err = ts.ParseGlob(filepath.Join(dir, "*.partial.tmpl"))
+		ts, err = ts.ParseGlob(filepath.Join(dir, "/html/*.partial.tmpl"))
 		if err != nil {
 			return nil, err
 		}
@@ -46,6 +47,8 @@ func newTemplateCache(dir string) (map[string]*template.Template, error) {
 
 type templateData struct {
 	CurrentYear int
+	Flash       string
+	Form        *forms.Form
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
