@@ -7,10 +7,10 @@ LDFLAGS=""
 .DEFAULT_GOAL: build
 
 build:
-    gox ${LDFLAGS} -osarch="linux/amd64 darwin/amd64 windows/amd64" -output "dist/${BINARY}_{{.OS}}_{{.Arch}}"
+    gox -osarch="linux/amd64 darwin/amd64 windows/amd64" -output "dist/${BINARY}_{{.OS}}_{{.Arch}}"
 
 install:
-    go install ${LDFLAGS}
+    go install 
 
 clean:
     if [ -d dist ] ; then rm -rf dist; fi
