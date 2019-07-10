@@ -2,8 +2,8 @@ BINARY=snippetbox
 VERSION=0.0.1
 GITSHA=`git rev-parse HEAD`
 BUILD_TIME=`date -u +%Y-%m-%dT%H:%M:%S%Z`
-#LDFLAGS=-ldflags "-X github.com/aligncommerce/snippetbox/cmd.Version=${VERSION} -X github.com/aligncommerce/snippetbox/cmd.GitSHA=${GITSHA} -X github.com/aligncommerce/snippetbox/cmd.BuildTime=${BUILD_TIME}"
 LDFLAGS=""
+
 .DEFAULT_GOAL: build
 
 build:
